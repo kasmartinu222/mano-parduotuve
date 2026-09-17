@@ -7,17 +7,22 @@
 <style>
 body {
   margin: 0;
+  padding: 20px;
   font-family: Arial, sans-serif;
   background: #f5f5f5;
-  padding: 20px;
 }
 
 .container {
-  max-width: 700px;
+  max-width: 740px;
   margin: auto;
   background: white;
   padding: 20px;
   border-radius: 12px;
+  box-sizing: border-box;
+}
+
+h2 {
+  margin-top: 0;
 }
 
 table {
@@ -26,9 +31,13 @@ table {
 }
 
 th, td {
-  padding: 12px;
+  padding: 12px 8px;
   border-bottom: 1px solid #ddd;
   text-align: left;
+}
+
+.quantity {
+  white-space: nowrap;
 }
 
 .quantity button {
@@ -44,6 +53,7 @@ th, td {
   border: none;
   background: transparent;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .total {
@@ -55,19 +65,18 @@ th, td {
 
 .buttons {
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
   margin-top: 15px;
-}
-
-button {
-  cursor: pointer;
 }
 
 .clear {
   padding: 10px 15px;
   background: #ddd;
+  color: #222;
   border: none;
   border-radius: 7px;
+  cursor: pointer;
 }
 
 .pay {
@@ -77,6 +86,7 @@ button {
   border: none;
   border-radius: 7px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .empty {
@@ -151,6 +161,7 @@ function updateCart() {
 
     html += `
       <tr>
+
         <td>${item.name}</td>
 
         <td class="quantity">
@@ -166,6 +177,7 @@ function updateCart() {
             ❌
           </button>
         </td>
+
       </tr>
     `;
   });
@@ -181,7 +193,7 @@ function updateCart() {
     <div class="buttons">
 
       <button class="clear" onclick="clearCart()">
-        Išvalyti
+        Išvalyti krepšelį
       </button>
 
       <button class="pay" onclick="checkout()">
@@ -242,8 +254,8 @@ function checkout() {
   });
 
   alert(
-    "Užsakymas paruoštas!\n\n" +
-    "Suma: " + total.toFixed(2) + " €"
+    "Užsakymas paruoštas apmokėjimui!\n\n" +
+    "Bendra suma: " + total.toFixed(2) + " €"
   );
 }
 
