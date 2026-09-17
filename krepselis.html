@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: transparent;
+}
+
+.cart-box {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cart-button {
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 9px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cart-window {
+  display: none;
+  margin-top: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.cart-window.open {
+  display: block;
+}
+
+.item {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+}
+
+.controls {
+  margin-top: 8px;
+}
+
+.controls button {
+  padding: 5px 9px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.remove {
+  margin-left: 10px;
+}
+
+.total {
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="cart-box">
+
+<button class="cart-button" onclick="openCart()">
+🛒 Krepšelis (<span id="count">0</span>)
+</button>
+
+<div class="cart-window" id="cartWindow">
+
+<h3>🛒 Krepšelis</h3>
+
+<div id="items"></div>
+
+<div class="total">
+Iš viso: <span id="total">0.00</span> €
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const CART_KEY = "manoKrepselis";
+
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+function openCart() {
+  document.getElementById("cartWindow").classList.toggle("open");
+  updateCart();
+}
+
+function updateCart() {
+
+  const cart = getCart();
+
+  let count = 0;
+  let total = 0;
+  let html = "";
+
+  cart.forEach((item, index) => {
+
+    const quantity = Number(item.quantity) || 1;
+    const price = Number(item.price) || 0;
+
+    count += quantity;
+    total += price * quantity;
+
+    html += `
+      <div class="item">
+
+        <strong>${item.name}</strong><br>
+        ${price.toFixed(2)} € × ${quantity}
+
+        <div class="controls">
+
+          <button onclick="changeQuantity(${index}, -1)">−</button>
+
+          <button onclick="changeQuantity(${index}, 1)">+</button>
+
+          <button class="remove" onclick="removeItem(${index})">
+            Pašalinti
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  });
+
+  if (cart.length === 0) {
+    html = "<p>Krepšelis tuščias.</p>";
+  }
+
+  document.getElementById("items").innerHTML = html;
+  document.getElementById("count").textContent = count;
+  document.getElementById("total").textContent = total.toFixed(2);
+}
+
+function changeQuantity(index, amount) {
+
+  const cart = getCart();
+
+  cart[index].quantity =
+    (Number(cart[index].quantity) || 1) + amount;
+
+  if (cart[index].quantity <= 0) {
+    cart.splice(index, 1);
+  }
+
+  saveCart(cart);
+  updateCart();
+}
+
+function removeItem(index) {
+
+  const cart = getCart();
+
+  cart.splice(index, 1);
+
+  saveCart(cart);
+  updateCart();
+}
+
+window.addEventListener("storage", updateCart);
+
+updateCart();
+
+</script>
+
+</body>
+</html>
