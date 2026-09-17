@@ -20,10 +20,6 @@ body {
   border-radius: 12px;
 }
 
-h2 {
-  margin-top: 0;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -57,14 +53,30 @@ th, td {
   margin-top: 20px;
 }
 
-.clear {
+.buttons {
+  display: flex;
+  gap: 10px;
   margin-top: 15px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.clear {
   padding: 10px 15px;
+  background: #ddd;
+  border: none;
+  border-radius: 7px;
+}
+
+.pay {
+  padding: 10px 20px;
   background: #222;
   color: white;
   border: none;
   border-radius: 7px;
-  cursor: pointer;
+  font-size: 16px;
 }
 
 .empty {
@@ -139,7 +151,6 @@ function updateCart() {
 
     html += `
       <tr>
-
         <td>${item.name}</td>
 
         <td class="quantity">
@@ -155,7 +166,6 @@ function updateCart() {
             ❌
           </button>
         </td>
-
       </tr>
     `;
   });
@@ -168,9 +178,17 @@ function updateCart() {
       Iš viso: ${total.toFixed(2)} €
     </div>
 
-    <button class="clear" onclick="clearCart()">
-      Išvalyti krepšelį
-    </button>
+    <div class="buttons">
+
+      <button class="clear" onclick="clearCart()">
+        Išvalyti
+      </button>
+
+      <button class="pay" onclick="checkout()">
+        💳 Apmokėti
+      </button>
+
+    </div>
   `;
 
   content.innerHTML = html;
@@ -206,6 +224,27 @@ function clearCart() {
   localStorage.removeItem(CART_KEY);
 
   updateCart();
+}
+
+function checkout() {
+
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    alert("Krepšelis tuščias.");
+    return;
+  }
+
+  let total = 0;
+
+  cart.forEach(item => {
+    total += Number(item.price) * Number(item.quantity);
+  });
+
+  alert(
+    "Užsakymas paruoštas!\n\n" +
+    "Suma: " + total.toFixed(2) + " €"
+  );
 }
 
 window.addEventListener("storage", updateCart);
