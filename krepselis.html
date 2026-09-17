@@ -11,44 +11,28 @@ body {
   background: transparent;
 }
 
-.cart-box {
+table {
   width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.cart-button {
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
   background: #222;
   color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 9px 16px;
-  font-size: 14px;
-  cursor: pointer;
 }
 
-.cart-window {
-  display: none;
-  margin-top: 12px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 18px;
-}
-
-.cart-window.open {
-  display: block;
-}
-
-.item {
-  border-bottom: 1px solid #ddd;
-  padding: 12px 0;
-}
-
-.controls {
-  margin-top: 8px;
-}
-
-.controls button {
-  padding: 5px 9px;
+.quantity button {
+  padding: 4px 9px;
+  margin: 0 3px;
   border: 1px solid #ccc;
   background: white;
   border-radius: 5px;
@@ -56,52 +40,39 @@ body {
 }
 
 .remove {
-  margin-left: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .total {
-  font-weight: bold;
+  margin-top: 15px;
   font-size: 18px;
-  margin-top: 15px;
-}
-
-.pay {
-  margin-top: 15px;
-  width: 100%;
-  padding: 12px;
-  background: #222;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
+  font-weight: bold;
+  text-align: right;
 }
 </style>
 </head>
 
 <body>
 
-<div class="cart-box">
-
-<button class="cart-button" onclick="openCart()">
-🛒 Krepšelis (<span id="count">0</span>)
-</button>
-
-<div class="cart-window" id="cartWindow">
-
 <h3>🛒 Krepšelis</h3>
 
-<div id="items"></div>
+<table>
+<thead>
+<tr>
+<th>Prekė</th>
+<th>Kiekis</th>
+<th>Kaina</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody id="items"></tbody>
+</table>
 
 <div class="total">
 Iš viso: <span id="total">0.00</span> €
-</div>
-
-<button class="pay" onclick="checkout()">
-💳 Apmokėti
-</button>
-
-</div>
 </div>
 
 <script>
@@ -120,53 +91,55 @@ function saveCart(cart) {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
-function openCart() {
-  document.getElementById("cartWindow").classList.toggle("open");
-  updateCart();
-}
-
 function updateCart() {
 
   const cart = getCart();
 
-  let count = 0;
-  let total = 0;
   let html = "";
-
-  cart.forEach((item, index) => {
-
-    const quantity = Number(item.quantity) || 1;
-    const price = Number(item.price) || 0;
-
-    count += quantity;
-    total += price * quantity;
-
-    html += `
-      <div class="item">
-        <strong>${item.name}</strong><br>
-        ${price.toFixed(2)} € × ${quantity}
-
-        <div class="controls">
-
-          <button onclick="changeQuantity(${index}, -1)">−</button>
-
-          <button onclick="changeQuantity(${index}, 1)">+</button>
-
-          <button class="remove" onclick="removeItem(${index})">
-            Pašalinti
-          </button>
-
-        </div>
-      </div>
-    `;
-  });
+  let total = 0;
 
   if (cart.length === 0) {
-    html = "<p>Krepšelis tuščias.</p>";
+
+    html = `
+      <tr>
+        <td colspan="4">Krepšelis tuščias</td>
+      </tr>
+    `;
+
+  } else {
+
+    cart.forEach((item, index) => {
+
+      const quantity = Number(item.quantity) || 1;
+      const price = Number(item.price) || 0;
+
+      total += price * quantity;
+
+      html += `
+        <tr>
+
+          <td>${item.name}</td>
+
+          <td class="quantity">
+            <button onclick="changeQuantity(${index}, -1)">−</button>
+            ${quantity}
+            <button onclick="changeQuantity(${index}, 1)">+</button>
+          </td>
+
+          <td>${(price * quantity).toFixed(2)} €</td>
+
+          <td>
+            <button class="remove" onclick="removeItem(${index})">
+              ❌
+            </button>
+          </td>
+
+        </tr>
+      `;
+    });
   }
 
   document.getElementById("items").innerHTML = html;
-  document.getElementById("count").textContent = count;
   document.getElementById("total").textContent = total.toFixed(2);
 }
 
@@ -193,27 +166,6 @@ function removeItem(index) {
 
   saveCart(cart);
   updateCart();
-}
-
-function checkout() {
-
-  const cart = getCart();
-
-  if (cart.length === 0) {
-    alert("Krepšelis tuščias.");
-    return;
-  }
-
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  alert(
-    "Užsakymas paruoštas!\n\n" +
-    "Suma: " + total.toFixed(2) + " €\n\n" +
-    "Toliau bus prijungtas tikras apmokėjimas."
-  );
 }
 
 window.addEventListener("storage", updateCart);
