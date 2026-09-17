@@ -83,10 +83,34 @@ body {
 
 <div id="items"></div>
 
+</script>function checkout() {
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    alert("Krepšelis tuščias.");
+    return;
+  }
+
+  alert("Užsakymas paruoštas apmokėjimui.");
+}
+
 <div class="total">
 Iš viso: <span id="total">0.00</span> €
 </div>
 
+<button onclick="checkout()" style="
+  margin-top:15px;
+  width:100%;
+  padding:12px;
+  background:#222;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+">
+  💳 Apmokėti
+</button>
 </div>
 
 </div>
