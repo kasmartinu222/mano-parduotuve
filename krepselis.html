@@ -7,11 +7,11 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
     background: transparent;
+    font-family: Arial, sans-serif;
 }
 
-.cart-button {
+button {
     background: #222;
     color: white;
     border: none;
@@ -21,285 +21,43 @@ body {
     cursor: pointer;
 }
 
-.cart-button:hover {
+button:hover {
     background: #444;
-}
-
-.cart-box {
-    display: none;
-    position: fixed;
-    top: 60px;
-    left: 10px;
-    width: 320px;
-    max-height: 500px;
-    overflow-y: auto;
-    background: white;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-    z-index: 999999;
-    box-sizing: border-box;
-}
-
-.cart-box.show {
-    display: block;
-}
-
-.title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.item {
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-.item-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.controls button {
-    width: 30px;
-    height: 30px;
-    border: none;
-    border-radius: 6px;
-    background: #eee;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-.remove {
-    margin-left: auto;
-    background: #222 !important;
-    color: white;
-}
-
-.total {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 15px;
-}
-
-.action {
-    width: 100%;
-    padding: 11px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.clear {
-    background: #eee;
-}
-
-.order {
-    background: #222;
-    color: white;
 }
 </style>
 </head>
 
 <body>
 
-<button class="cart-button" onclick="showCart()">
+<button onclick="openCart()">
     🛒 Krepšelis (<span id="count">0</span>)
 </button>
 
-<div class="cart-box" id="cartBox">
-
-    <div class="title">
-        Jūsų krepšelis
-    </div>
-
-    <div id="items"></div>
-
-    <div class="total">
-        Suma: <span id="total">0.00</span> €
-    </div>
-
-    <button class="action clear" onclick="clearCart()">
-        Ištuštinti krepšelį
-    </button>
-
-    <button class="action order" onclick="order()">
-        Užsakyti
-    </button>
-
-</div>
-
 <script>
 
-function getCart() {
-    return JSON.parse(localStorage.getItem("manoKrepselis")) || [];
-}
+function updateCount() {
 
-function saveCart(cart) {
-    localStorage.setItem(
-        "manoKrepselis",
-        JSON.stringify(cart)
-    );
-}
-
-function showCart() {
-
-    const box = document.getElementById("cartBox");
-
-    box.classList.toggle("show");
-
-    updateCart();
-}
-
-function updateCart() {
-
-    const cart = getCart();
+    let cart =
+        JSON.parse(localStorage.getItem("manoKrepselis")) || [];
 
     let count = 0;
-    let total = 0;
 
     cart.forEach(item => {
         count += item.quantity;
-        total += item.price * item.quantity;
     });
 
     document.getElementById("count").innerText = count;
-    document.getElementById("total").innerText =
-        total.toFixed(2);
-
-    let html = "";
-
-    if (cart.length === 0) {
-
-        html = "<p>Krepšelis tuščias.</p>";
-
-    } else {
-
-        cart.forEach((item, index) => {
-
-            html += `
-            <div class="item">
-
-                <div class="item-name">
-                    ${item.name}
-                </div>
-
-                <div>
-                    ${item.price.toFixed(2)} €
-                </div>
-
-                <div class="controls">
-
-                    <button onclick="changeQuantity(${index}, -1)">
-                        −
-                    </button>
-
-                    <span>
-                        ${item.quantity}
-                    </span>
-
-                    <button onclick="changeQuantity(${index}, 1)">
-                        +
-                    </button>
-
-                    <button
-                        class="remove"
-                        onclick="removeItem(${index})">
-                        ✕
-                    </button>
-
-                </div>
-
-            </div>
-            `;
-
-        });
-    }
-
-    document.getElementById("items").innerHTML = html;
 }
 
-function changeQuantity(index, amount) {
+function openCart() {
 
-    const cart = getCart();
-
-    cart[index].quantity += amount;
-
-    if (cart[index].quantity <= 0) {
-        cart.splice(index, 1);
-    }
-
-    saveCart(cart);
-    updateCart();
-}
-
-function removeItem(index) {
-
-    const cart = getCart();
-
-    cart.splice(index, 1);
-
-    saveCart(cart);
-    updateCart();
-}
-
-function clearCart() {
-
-    localStorage.removeItem("manoKrepselis");
-
-    updateCart();
-}
-
-function order() {
-
-    const cart = getCart();
-
-    if (cart.length === 0) {
-
-        alert("Krepšelis tuščias.");
-
-        return;
-    }
-
-    let message = "Užsakymas:\n\n";
-
-    cart.forEach(item => {
-
-        message +=
-            item.name +
-            " × " +
-            item.quantity +
-            " = " +
-            (item.price * item.quantity).toFixed(2) +
-            " €\n";
-
-    });
-
-    const total = cart.reduce(
-        (sum, item) =>
-            sum + item.price * item.quantity,
-        0
+    window.open(
+        "https://kasmartinu222.github.io/mano-parduotuve/krepselis-pilnas.html",
+        "_blank"
     );
-
-    message +=
-        "\nViso: " +
-        total.toFixed(2) +
-        " €";
-
-    alert(message);
 }
 
-updateCart();
+updateCount();
 
 </script>
 
